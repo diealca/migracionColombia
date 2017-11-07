@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+
+
+<html lang="es">
+
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Migración en Colombia">
+    <meta name="keywords" content="Colombia, Extranjeros">
+    <meta name="author" content="">
+
+    <title>Migración en Colombia</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/css/bootstrap.css">
+    
+    <!-- Custom fonts for this template -->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Josefin+Slab:100,300,400,600,700,100italic,300italic,400italic,600italic,700italic" rel="stylesheet" type="text/css">
+
+    <!-- Custom styles for this template -->
+    <link href="css/business-casual.css" rel="stylesheet">
+
+    <style>
+        label {
+            font-family: sans-serif;
+            font-size: 14px;
+            position: absolute;
+            left: 92px; top: 26px;
+        }
+        .axis .domain { display: none; }
+        .axis line { stroke: #ccc; }
+        .axis.x0 text { font-weight: 700; }
+        .hover-active rect { opacity: .67; }
+        .hover-active rect.hover { opacity: 1; }
+    </style>
+
+  </head>
+
+  <body>
+
+    <div class="tagline-upper text-center text-heading text-shadow text-white mt-5 d-none d-lg-block">Migración en Colombia</div>
+    
+
+    <div class="container">
+
+      <div class="bg-faded p-4 my-4">
+        
+
+      <div class="bg-faded p-4 my-4">
+        <hr class="divider">
+        <h2 class="text-center text-lg text-uppercase my-0">Intercambio cultural</strong>
+        </h2>
+        <hr class="divider">
+        <p aling="justify">A partir de los boletines migratorios, disponibles (<a href="http://migracioncolombia.gov.co/index.php/es/?option=com_content&view=article&id=718">aquí</a>), desde el año 2014 hasta septiembre de 2017, se realizó la visualización que se muestra a continuación. En ella se presenta la relación que existe entre los extranjeros que vienen al país y los colombianos que visitan las diferentes regiones del mundo. A partir de los resultados se puede evidenciar que es mayor el número de colombianos que visitan países en el exterior que los extranjeros que vienen a Colombia. También se evidencia un aumento año de los visitantes a Colombia, al igual que para los colombianos que vieajan al exterior</p>
+        <p>Para el caso de Venezula se encuentra que los colombianos dejaron de viajar a este país a partir del 2015.</p>
+        <p>Los continentes de los cuales vienen mas extranjeros  son más visitados por los colombianos en orden son: América del Sur, América del Norte y Europa</p>
+        <svg></svg>
+      </div>
+
+    </div>
+    <!-- /.container -->
+
+    <footer class="bg-faded text-center py-5">
+      <div class="container">
+        <p class="m-0">2017</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/popper/popper.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+    
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.3.2/js/tether.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha/js/bootstrap.min.js"></script>
+    <script>        
+        var margin = { top: 15, right: 15, bottom: 40, left: 60 }
+        var width = 960 - margin.left - margin.right
+        var height = 500 - margin.top - margin.bottom
+
+        var orderedContinents = ['América del Sur', 'América del Norte','América Central', 'Europa' ,'Antillas','Asia', 'África', 'Oceanía','Antártica']
+        var color = d3.scaleOrdinal()
+            .domain(orderedContinents)
+            .range(['#66c2a5', '#fc8d62', '#8da0cb', '#e78ac3', '#a6d854', '#ffd92f', '#ff2f2f','#2ffff4','#822fff'])
+
+
+        var tickFormat = function (n) {
+            return n
+        }
+
+        var options = {
+            key: 'value',
+            country: null
+        }
+
+        d3.json('data/data.json', initialize)
+
+        function initialize(error, data) {
+            if (error) { throw error }
+
+            var root = d3.hierarchy(data).sum(function (d) { return d[options.key] })
+            var yearData = root.children
+
+            yearData.sort(function (a, b) { return a.data.year - b.data.year })
+
+            var svg = d3.select('svg')
+                .attr('width', width + margin.left + margin.right)
+                .attr('height', height + margin.top + margin.bottom)
+                .append('g')
+                .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+
+            var x0 = d3.scaleBand()
+                .domain(yearData.map(function (d) { return d.data.year }).sort())
+                .range([0, width])
+                .padding(0.15)
+
+            var x1 = d3.scaleBand()
+                .domain(['Inmigrantes', 'Emigrantes'])
+                .rangeRound([0, x0.bandwidth()])
+                .paddingInner(0.1)
+
+            var y = d3.scaleLinear()
+                .domain([0, d3.max(yearData, function (d) {
+                    return d3.max(d.children, function (e) { return e.value })
+                })]).nice()
+                .range([0, height])
+
+            var x0Axis = d3.axisBottom()
+                .scale(x0)
+                .tickSize(0)
+
+            var x1Axis = d3.axisBottom()
+                .scale(x1)
+
+            var yAxis = d3.axisLeft()
+                .tickSize(-width)
+                .tickFormat(tickFormat)
+                .scale(y.copy().range([height, 0]))
+
+            svg.append('g')
+                .attr('class', 'x0 axis')
+                .attr('transform', 'translate(0,' + (height + 22) + ')')
+                .call(x0Axis)
+
+            var gy = svg.append('g')
+                .attr('class', 'y axis')
+                .call(yAxis)
+
+            var years = svg.selectAll('.year')
+                .data(yearData, function (d) { return d.data.year })
+                .enter().append('g')
+                .attr('class', 'year')
+                .attr('transform', function (d) {
+                    return 'translate(' + x0(d.data.year) + ',0)'
+                })
+
+            years.append('g')
+                .attr('class', 'x1 axis')
+                .attr('transform', 'translate(0,' + height + ')')
+                .call(x1Axis)
+
+            d3.select('#inflation-adjusted').on('change', function () {
+                options.key = this.checked ? 'adj_value' : 'value'
+                update()
+            })
+
+            update()
+
+            function sum(d) {
+                return !options.country || options.country === d.country ? d[options.key] : 0
+            }
+
+            function update() {
+                root.sum(sum)
+
+                var t = d3.transition()
+
+                var typeData = d3.merge(yearData.map(function (d) { return d.children }))
+
+                y.domain([0, d3.max(typeData.map(function (d) { return d.value }))]).nice()
+
+                // We use a copied Y scale to invert the range for display purposes
+                yAxis.scale(y.copy().range([height, 0]))
+                gy.transition(t).call(yAxis)
+
+                var types = years.selectAll('.type')
+                    .data(function (d) { return d.children },
+                        function (d) { return d.data.type })
+                    .each(function (d) {
+                        // UPDATE
+                        // The copied branches are orphaned from the larger hierarchy, and must be
+                        // updated separately (see note at L152).
+                        d.treemapRoot.sum(sum)
+                        d.treemapRoot.children.forEach(function (d) {
+                            d.sort(function (a, b) { return b.value - a.value })
+                        })
+                    })
+
+                types = types.enter().append('g')
+                    .attr('class', 'type')
+                    .attr('transform', function (d) {
+                        return 'translate(' + x1(d.data.type) + ',' + height + ')'
+                    })
+                    .each(function (d) {
+                        // ENTER
+                        // Note that we can use .each on selections as a way to perform operations
+                        // at a given depth of the hierarchy tree.
+                        d.children.sort(function (a, b) {
+                            return orderedContinents.indexOf(b.data.continent) -
+                                orderedContinents.indexOf(a.data.continent)
+                        })
+                        d.children.forEach(function (d) {
+                            d.sort(function (a, b) { return b.value - a.value })
+                        })
+                        d.treemap = d3.treemap().tile(d3.treemapResquarify)
+
+                        // The treemap layout must be given a root node, so we make a copy of our
+                        // child node, which creates a new tree from the branch.
+                        d.treemapRoot = d.copy()
+                    })
+                    .merge(types)
+                    .each(function (d) {
+                        // UPDATE + ENTER
+                        d.treemap.size([x1.bandwidth(), y(d.value)])(d.treemapRoot)
+                    })
+
+                // d3.hierarchy gives us a convenient way to access the parent datum. This line
+                // adds an index property to each node that we'll use for the transition delay.
+                root.each(function (d) { d.index = d.parent ? d.parent.children.indexOf(d) : 0 })
+
+                types.transition(t)
+                    .delay(function (d, i) { return d.parent.index * 150 + i * 50 })
+                    .attr('transform', function (d) {
+                        return 'translate(' + x1(d.data.type) + ',' + (height - y(d.value)) + ')'
+                    })
+
+                var continents = types.selectAll('.continent')
+                    // Note that we're using our copied branch.
+                    .data(function (d) { return d.treemapRoot.children },
+                        function (d) { return d.data.continent })
+
+                continents = continents.enter().append('g')
+                    .attr('class', 'continent')
+                    .merge(continents)
+
+                var countries = continents.selectAll('.country')
+                    .data(function (d) { return d.children },
+                        function (d) { return d.data.country })
+
+                var enterCountries = countries.enter().append('rect')
+                    .attr('class', 'country')
+                    .attr('x', function (d) { return d.value ? d.x0 : x1.bandwidth() / 2 })
+                    .attr('width', function (d) { return d.value ? d.x1 - d.x0 : 0 })
+                    .attr('y', 0)
+                    .attr('height', 0)
+                    .style('fill', function (d) { return color(d.parent.data.continent) })
+
+                countries = countries.merge(enterCountries)
+
+                enterCountries
+                    .on('mouseover', function (d) {
+                        svg.classed('hover-active', true)
+                        countries.classed('hover', function (e) {
+                            return e.data.country === d.data.country
+                        })
+                    })
+                    .on('mouseout', function () {
+                        svg.classed('hover-active', false)
+                        countries.classed('hover', false)
+                    })
+                    .on('click', function (d) {
+                        options.country = options.country === d.data.country ? null : d.data.country
+                        update()
+                    })
+                    .append('title')
+                    .text(function (d) { return d.data.country +"\n" + d.data.value})
+
+                countries.filter(function (d) { return d.data.country === options.country })
+                    .each(function (d) { d3.select(this.parentNode).raise() })
+                    .raise()
+
+                countries
+                    .transition(t)
+                    .attr('x', function (d) { return d.value ? d.x0 : x1.bandwidth() / 2 })
+                    .attr('width', function (d) { return d.value ? d.x1 - d.x0 : 0 })
+                    .attr('y', function (d) { return d.value ? d.y0 : d.parent.parent.y1 / 2 })
+                    .attr('height', function (d) { return d.value ? d.y1 - d.y0 : 0 })
+            }
+        }
+
+        </script>
+
+    
+    
+
+  </body>
+
+</html>
